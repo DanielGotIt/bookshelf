@@ -5,15 +5,24 @@ import * as React from 'react'
 import Tooltip from '@reach/tooltip'
 import {FaSearch, FaTimes} from 'react-icons/fa'
 import * as colors from 'styles/colors'
-import {useBookSearch, useRefetchBookSearchQuery} from 'utils/books'
+import {useRefetchBookSearchQuery} from 'utils/books'
 import {BookRow} from 'components/book-row'
 import {BookListUL, Spinner, Input} from 'components/lib'
 import {Profiler} from 'components/profiler'
+import {useGetBooksQuery} from 'services/book'
 
 function DiscoverBooksScreen() {
   const [query, setQuery] = React.useState('')
   const [queried, setQueried] = React.useState()
-  const {books, error, isLoading, isError, isSuccess} = useBookSearch(query)
+
+  const {
+    data: books = [],
+    error,
+    isError,
+    isSuccess,
+    isFetching,
+  } = useGetBooksQuery(query)
+
   const refetchBookSearchQuery = useRefetchBookSearchQuery()
 
   React.useEffect(() => {
@@ -47,7 +56,7 @@ function DiscoverBooksScreen() {
                   background: 'transparent',
                 }}
               >
-                {isLoading ? (
+                {isFetching ? (
                   <Spinner />
                 ) : isError ? (
                   <FaTimes aria-label="error" css={{color: colors.danger}} />
@@ -71,7 +80,7 @@ function DiscoverBooksScreen() {
           <div css={{marginTop: 20, fontSize: '1.2em', textAlign: 'center'}}>
             <p>Welcome to the discover page.</p>
             <p>Here, let me load a few books for you...</p>
-            {isLoading ? (
+            {isFetching ? (
               <div css={{width: '100%', margin: 'auto'}}>
                 <Spinner />
               </div>
@@ -99,7 +108,7 @@ function DiscoverBooksScreen() {
           </Profiler>
         ) : queried ? (
           <div css={{marginTop: 20, fontSize: '1.2em', textAlign: 'center'}}>
-            {isLoading ? (
+            {isFetching ? (
               <div css={{width: '100%', margin: 'auto'}}>
                 <Spinner />
               </div>

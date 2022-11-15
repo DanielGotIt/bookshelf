@@ -15,10 +15,12 @@ import {Spinner, Textarea, ErrorMessage} from 'components/lib'
 import {Rating} from 'components/rating'
 import {Profiler} from 'components/profiler'
 import {StatusButtons} from 'components/status-buttons'
+import {useGetBookQuery} from 'services/book'
 
 function BookScreen() {
   const {bookId} = useParams()
-  const book = useBook(bookId)
+  const {data: book = {}} = useGetBookQuery(bookId)
+
   const listItem = useListItem(bookId)
 
   const {title, author, coverImageUrl, publisher, synopsis} = book
