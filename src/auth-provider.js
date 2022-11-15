@@ -1,6 +1,7 @@
 // pretend this is firebase, netlify, or auth0's code.
 // you shouldn't have to implement something like this in your own app
 
+import {client as clientApi} from 'utils/api-client'
 const localStorageKey = '__auth_provider_token__'
 
 async function getToken() {
@@ -21,6 +22,10 @@ function login({username, password}) {
 
 function register({username, password}) {
   return client('register', {username, password}).then(handleUserResponse)
+}
+
+function loginWithToken(token) {
+  return clientApi('bootstrap', {token})
 }
 
 async function logout() {
@@ -48,4 +53,4 @@ async function client(endpoint, data) {
   })
 }
 
-export {getToken, login, register, logout, localStorageKey}
+export {loginWithToken, getToken, login, register, logout, localStorageKey}
