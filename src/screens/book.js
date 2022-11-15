@@ -19,7 +19,7 @@ import {useGetBookQuery} from 'services/book'
 
 function BookScreen() {
   const {bookId} = useParams()
-  const {data: book = {}} = useGetBookQuery(bookId)
+  const {data: book = {}, isFetching} = useGetBookQuery(bookId)
 
   const listItem = useListItem(bookId)
 
@@ -65,7 +65,7 @@ function BookScreen() {
                   minHeight: 100,
                 }}
               >
-                {book.loadingBook ? null : <StatusButtons book={book} />}
+                {isFetching ? null : <StatusButtons book={book} />}
               </div>
             </div>
             <div css={{marginTop: 10, minHeight: 46}}>
@@ -78,9 +78,7 @@ function BookScreen() {
             </p>
           </div>
         </div>
-        {!book.loadingBook && listItem ? (
-          <NotesTextarea listItem={listItem} />
-        ) : null}
+        {!isFetching && listItem ? <NotesTextarea listItem={listItem} /> : null}
       </div>
     </Profiler>
   )

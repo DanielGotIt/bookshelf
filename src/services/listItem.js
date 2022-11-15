@@ -1,6 +1,6 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react'
 
-export const api = createApi({
+export const listItemApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.REACT_APP_API_URL,
     prepareHeaders: (headers, {getState}) => {
@@ -12,57 +12,14 @@ export const api = createApi({
       return headers
     },
   }),
-  tagTypes: ['Books'],
+  tagTypes: ['ListItems'],
   endpoints: build => ({
-    getBooks: build.query({
-      query: query => `books?query=${encodeURIComponent(query)}`,
-      providesTags: result => {
-        if (result)
-          return [
-            ...result.map(({id}) => ({type: 'Book', id})),
-            {type: 'Book', id: 'LIST'},
-          ]
-        return [{type: 'Book', id: 'LIST'}]
-      },
-      transformResponse: (response, meta, arg) => response?.books,
-    }),
-    addBook: build.mutation({
-      query: body => ({
-        url: `Books`,
-        method: 'POST',
-        body,
-      }),
-      invalidatesTags: [{type: 'Book', id: 'LIST'}],
-    }),
-    getBook: build.query({
-      query: id => `books/${id}`,
-      providesTags: (result, error, id) => [{type: 'Book', id}],
-      transformResponse: (response, meta, arg) => response?.book,
-    }),
-    updateBook: build.mutation({
-      query: body => ({
-        url: `list-items`,
-        method: 'PUT',
-        body,
-      }),
-      invalidatesTags: (result, error, {id}) => [{type: 'Book', id}],
-    }),
-    deleteBook: build.mutation({
-      query(id) {
-        return {
-          url: `books/${id}`,
-          method: 'DELETE',
-        }
-      },
-      invalidatesTags: (result, error, id) => [{type: 'Post', id}],
-    }),
-    //listItem
     getListItem: build.query({
       query: () => `list-items`,
       providesTags: result => {
         if (result)
           return [
-            ...result.map(({id}) => ({type: 'ListItem', id})),
+            ...result.map(({id}) => ({type: 'ListItems', id})),
             {type: 'ListItems', id: 'LIST'},
           ]
         return [{type: 'ListItems', id: 'LIST'}]
@@ -96,13 +53,8 @@ export const api = createApi({
 })
 
 export const {
-  useGetBookQuery,
-  useGetBooksQuery,
-  useAddBookMutation,
-  useUpdateBookMutation,
-  useDeleteBookMutation,
   useGetListItemQuery,
   useAddToReadingListMutation,
-  useRemoveFromListMutation,
   useFinishBookMutation,
-} = api
+  useRemoveFromListMutation,
+} = listItemApi

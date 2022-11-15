@@ -19,15 +19,21 @@ import {
 import * as colors from 'styles/colors'
 import {useAsync} from 'utils/hooks'
 import {CircleButton, Spinner} from './lib'
+import {
+  useGetListItemQuery,
+  useFinishBookMutation,
+  useRemoveFromListMutation,
+  useAddToReadingListMutation,
+} from 'services/book'
 
-function TooltipButton({label, highlight, onClick, icon, ...rest}) {
-  const {isLoading, isError, error, run, reset} = useAsync()
+function TooltipButton({label, status, highlight, onClick, icon, ...rest}) {
+  const {isLoading, isError, error, reset} = status || {}
 
   function handleClick() {
     if (isError) {
       reset()
     } else {
-      run(onClick())
+      onClick()
     }
   }
 
@@ -56,11 +62,18 @@ function TooltipButton({label, highlight, onClick, icon, ...rest}) {
 }
 
 function StatusButtons({book}) {
-  const listItem = useListItem(book.id)
+  // const listItem = useListItem(book.id)
+  const {data: listItems = []} = useGetListItemQuery()
+  const listItem = listItems?.find(li => li.bookId === book.id) ?? null
 
-  const [mutate] = useUpdateListItem({throwOnError: true})
+  console.log('listItem', listItem)
+  // const listItem = book
+
   const [handleRemoveClick] = useRemoveListItem({throwOnError: true})
-  const [handleAddClick] = useCreateListItem({throwOnError: true})
+  const [addtoReadingList, statusAddingToList] = useAddToReadingListMutation()
+
+  const [finishBook, statusFinishingBook] = useFinishBookMutation()
+  const [removeFromList, statusRemovingFromList] = useRemoveFromListMutation()
 
   return (
     <React.Fragment>
@@ -69,14 +82,18 @@ function StatusButtons({book}) {
           <TooltipButton
             label="Mark as unread"
             highlight={colors.yellow}
-            onClick={() => mutate({id: listItem.id, finishDate: null})}
+            onClick={() => removeFromList(listItem.id)}
+            status={statusRemovingFromList}
             icon={<FaBook />}
           />
         ) : (
           <TooltipButton
             label="Mark as read"
             highlight={colors.green}
-            onClick={() => mutate({id: listItem.id, finishDate: Date.now()})}
+            onClick={() =>
+              finishBook({id: listItem.id, finishDate: Date.now()})
+            }
+            status={statusFinishingBook}
             icon={<FaCheckCircle />}
           />
         )
@@ -92,7 +109,8 @@ function StatusButtons({book}) {
         <TooltipButton
           label="Add to list"
           highlight={colors.indigo}
-          onClick={() => handleAddClick({bookId: book.id})}
+          onClick={() => addtoReadingList({bookId: book.id})}
+          status={statusAddingToList}
           icon={<FaPlusCircle />}
         />
       )}
