@@ -46,31 +46,31 @@ export const authSlice = createSlice({
         state.status = 'loading'
       })
       .addCase(login.fulfilled, (state, action) => {
-        state.status = 'idle'
+        state.status = 'fulfilled'
         state.user = action.payload
       })
       .addCase(login.rejected, (state, action) => {
-        state.status = 'idle'
+        state.status = 'rejected'
       })
       .addCase(loginWithToken.pending, state => {
         state.status = 'loading'
       })
       .addCase(loginWithToken.fulfilled, (state, action) => {
-        state.status = 'idle'
+        state.status = 'fulfilled'
         state.user = action.payload.user
       })
       .addCase(loginWithToken.rejected, (state, action) => {
-        state.status = 'idle'
+        state.status = 'rejected'
       })
       .addCase(register.pending, state => {
         state.status = 'loading'
       })
       .addCase(register.fulfilled, (state, action) => {
-        state.status = 'idle'
+        state.status = 'fulfilled'
         state.user = action.payload
       })
       .addCase(register.rejected, (state, action) => {
-        state.status = 'idle'
+        state.status = 'rejected'
       })
   },
 })
