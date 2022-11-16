@@ -85,9 +85,7 @@ export const api = createApi({
               Object.assign(draft, [listItem])
             }),
           )
-        } catch (e) {
-          console.log('error', e)
-        }
+        } catch (e) {}
       },
     }),
     updateListItem: build.mutation({
@@ -106,9 +104,7 @@ export const api = createApi({
               Object.assign(draft, [listItem])
             }),
           )
-        } catch (e) {
-          console.log('error', e)
-        }
+        } catch (e) {}
       },
     }),
     removeFromList: build.mutation({
