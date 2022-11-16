@@ -137,6 +137,10 @@ const handlers = [
     const updatedListItem = await listItemsDB.update(listItemId, updates)
     const book = await booksDB.read(updatedListItem.bookId)
     return res(ctx.json({listItem: {...updatedListItem, book}}))
+    // return res(
+    //   ctx.status(400),
+    //   ctx.json({status: 400, message: '__test_error_message__'}),
+    // )
   }),
 
   rest.delete(`${apiUrl}/list-items/:listItemId`, async (req, res, ctx) => {

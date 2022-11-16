@@ -12,7 +12,7 @@ export const api = createApi({
       return headers
     },
   }),
-  tagTypes: ['Books'],
+  tagTypes: ['Books', 'Book', 'ListItem', 'ListItems'],
   endpoints: build => ({
     getBooks: build.query({
       query: query => `books?query=${encodeURIComponent(query)}`,
@@ -76,17 +76,40 @@ export const api = createApi({
         method: 'POST',
         body: {bookId},
       }),
-      invalidatesTags: (result, error, {bookId}) => [
-        {type: 'ListItems', id: 'LIST'},
-      ],
+      async onQueryStarted({bookId: id, ...patch}, {dispatch, queryFulfilled}) {
+        try {
+          const {data} = await queryFulfilled
+          const {listItem} = data
+          dispatch(
+            api.util.updateQueryData('getListItem', undefined, draft => {
+              Object.assign(draft, [listItem])
+            }),
+          )
+        } catch (e) {
+          console.log('error', e)
+        }
+      },
     }),
-    finishBook: build.mutation({
+    updateListItem: build.mutation({
       query: ({id, ...patch}) => ({
         url: `list-items/${id}`,
         method: 'PUT',
         body: {id, ...patch},
       }),
-      invalidatesTags: (result, error, {id}) => [{type: 'ListItem', id}],
+      async onQueryStarted({bookId: id, ...patch}, {dispatch, queryFulfilled}) {
+        try {
+          const {data} = await queryFulfilled
+
+          const {listItem} = data
+          dispatch(
+            api.util.updateQueryData('getListItem', undefined, draft => {
+              Object.assign(draft, [listItem])
+            }),
+          )
+        } catch (e) {
+          console.log('error', e)
+        }
+      },
     }),
     removeFromList: build.mutation({
       query: id => ({
@@ -107,5 +130,5 @@ export const {
   useGetListItemQuery,
   useAddToReadingListMutation,
   useRemoveFromListMutation,
-  useFinishBookMutation,
+  useUpdateListItemMutation,
 } = api

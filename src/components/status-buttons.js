@@ -14,7 +14,7 @@ import * as colors from 'styles/colors'
 import {CircleButton, Spinner} from './lib'
 import {
   useGetListItemQuery,
-  useFinishBookMutation,
+  useUpdateListItemMutation,
   useRemoveFromListMutation,
   useAddToReadingListMutation,
 } from 'services/book'
@@ -59,12 +59,9 @@ function StatusButtons({book}) {
   const {data: listItems = []} = useGetListItemQuery()
   const listItem = listItems?.find(li => li.bookId === book.id) ?? null
 
-  console.log('listItem', listItem)
-  // const listItem = book
-
   const [addtoReadingList, statusAddingToList] = useAddToReadingListMutation()
 
-  const [finishBook, statusFinishingBook] = useFinishBookMutation()
+  const [updateListItem, statusUpdateListItem] = useUpdateListItemMutation()
   const [removeFromList, statusRemovingFromList] = useRemoveFromListMutation()
 
   return (
@@ -74,8 +71,8 @@ function StatusButtons({book}) {
           <TooltipButton
             label="Mark as unread"
             highlight={colors.yellow}
-            onClick={() => finishBook({id: listItem.id, finishDate: null})}
-            status={statusFinishingBook}
+            onClick={() => updateListItem({id: listItem.id, finishDate: null})}
+            status={statusUpdateListItem}
             icon={<FaBook />}
           />
         ) : (
@@ -83,9 +80,9 @@ function StatusButtons({book}) {
             label="Mark as read"
             highlight={colors.green}
             onClick={() =>
-              finishBook({id: listItem.id, finishDate: Date.now()})
+              updateListItem({id: listItem.id, finishDate: Date.now()})
             }
-            status={statusFinishingBook}
+            status={statusUpdateListItem}
             icon={<FaCheckCircle />}
           />
         )

@@ -6,9 +6,7 @@ import debounceFn from 'debounce-fn'
 import {FaRegCalendarAlt} from 'react-icons/fa'
 import Tooltip from '@reach/tooltip'
 import {useParams} from 'react-router-dom'
-import {useBook} from 'utils/books'
 import {formatDate} from 'utils/misc'
-import {useListItem, useUpdateListItem} from 'utils/list-items'
 import * as mq from 'styles/media-queries'
 import * as colors from 'styles/colors'
 import {Spinner, Textarea, ErrorMessage} from 'components/lib'
@@ -16,14 +14,26 @@ import {Rating} from 'components/rating'
 import {Profiler} from 'components/profiler'
 import {StatusButtons} from 'components/status-buttons'
 import {useGetBookQuery} from 'services/book'
+import {FullPageSpinner} from 'components/lib'
+import {useGetListItemQuery, useUpdateListItemMutation} from 'services/book'
 
 function BookScreen() {
   const {bookId} = useParams()
-  const {data: book = {}, isFetching} = useGetBookQuery(bookId)
+  const {data: book = {}, isFetching, isError, error} = useGetBookQuery(bookId)
 
-  const listItem = useListItem(bookId)
+  const {data: listItems = [], isFetching: listItemFetching} =
+    useGetListItemQuery()
+  const listItem = listItems?.find(li => li.bookId === book.id) ?? null
 
   const {title, author, coverImageUrl, publisher, synopsis} = book
+
+  if (isFetching || listItemFetching) {
+    return <FullPageSpinner />
+  }
+
+  if (isError) {
+    throw error.data
+  }
 
   return (
     <Profiler id="Book Screen" metadata={{bookId, listItemId: listItem?.id}}>
@@ -103,11 +113,12 @@ function ListItemTimeframe({listItem}) {
 }
 
 function NotesTextarea({listItem}) {
-  const [mutate, {error, isError, isLoading}] = useUpdateListItem()
+  const [updateListItem, result] = useUpdateListItemMutation()
+  const {error, isError, isLoading} = result
 
   const debouncedMutate = React.useMemo(
-    () => debounceFn(mutate, {wait: 300}),
-    [mutate],
+    () => debounceFn(updateListItem, {wait: 300}),
+    [updateListItem],
   )
 
   function handleNotesChange(e) {
@@ -132,7 +143,7 @@ function NotesTextarea({listItem}) {
         {isError ? (
           <ErrorMessage
             variant="inline"
-            error={error}
+            error={error.data}
             css={{fontSize: '0.7em'}}
           />
         ) : null}
