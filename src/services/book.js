@@ -60,22 +60,25 @@ export const api = createApi({
     getListItem: build.query({
       query: () => `list-items`,
       providesTags: result => {
-        if (result)
+        if (result) {
           return [
             ...result.map(({id}) => ({type: 'ListItem', id})),
             {type: 'ListItems', id: 'LIST'},
           ]
+        }
         return [{type: 'ListItems', id: 'LIST'}]
       },
       transformResponse: (response, meta, arg) => response?.listItems,
     }),
     addToReadingList: build.mutation({
-      query: body => ({
+      query: ({bookId}) => ({
         url: `list-items`,
         method: 'POST',
-        body,
+        body: {bookId},
       }),
-      invalidatesTags: (result, error, {id}) => [{type: 'ListItem', id}],
+      invalidatesTags: (result, error, {bookId}) => [
+        {type: 'ListItems', id: 'LIST'},
+      ],
     }),
     finishBook: build.mutation({
       query: ({id, ...patch}) => ({

@@ -10,14 +10,7 @@ import {
   FaTimesCircle,
 } from 'react-icons/fa'
 import Tooltip from '@reach/tooltip'
-import {
-  useListItem,
-  useUpdateListItem,
-  useRemoveListItem,
-  useCreateListItem,
-} from 'utils/list-items'
 import * as colors from 'styles/colors'
-import {useAsync} from 'utils/hooks'
 import {CircleButton, Spinner} from './lib'
 import {
   useGetListItemQuery,
@@ -69,7 +62,6 @@ function StatusButtons({book}) {
   console.log('listItem', listItem)
   // const listItem = book
 
-  const [handleRemoveClick] = useRemoveListItem({throwOnError: true})
   const [addtoReadingList, statusAddingToList] = useAddToReadingListMutation()
 
   const [finishBook, statusFinishingBook] = useFinishBookMutation()
@@ -82,8 +74,8 @@ function StatusButtons({book}) {
           <TooltipButton
             label="Mark as unread"
             highlight={colors.yellow}
-            onClick={() => removeFromList(listItem.id)}
-            status={statusRemovingFromList}
+            onClick={() => finishBook({id: listItem.id, finishDate: null})}
+            status={statusFinishingBook}
             icon={<FaBook />}
           />
         ) : (
@@ -102,7 +94,8 @@ function StatusButtons({book}) {
         <TooltipButton
           label="Remove from list"
           highlight={colors.danger}
-          onClick={() => handleRemoveClick({id: listItem.id})}
+          onClick={() => removeFromList(listItem.id)}
+          status={statusRemovingFromList}
           icon={<FaMinusCircle />}
         />
       ) : (
