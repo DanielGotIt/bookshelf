@@ -62,8 +62,8 @@ function LoginForm({onSubmit, submitButton}) {
 
 function UnauthenticatedApp() {
   const dispatch = useDispatch()
-  const loginFn = data => dispatch(login(data))
-  const registerFn = data => dispatch(register(data))
+  const onLogin = data => dispatch(login(data))
+  const onRegister = data => dispatch(register(data))
 
   return (
     <div
@@ -91,7 +91,7 @@ function UnauthenticatedApp() {
           </ModalOpenButton>
           <ModalContents aria-label="Login form" title="Login">
             <LoginForm
-              onSubmit={loginFn}
+              onSubmit={onLogin}
               submitButton={<Button variant="primary">Login</Button>}
             />
           </ModalContents>
@@ -102,7 +102,7 @@ function UnauthenticatedApp() {
           </ModalOpenButton>
           <ModalContents aria-label="Registration form" title="Register">
             <LoginForm
-              onSubmit={registerFn}
+              onSubmit={onRegister}
               submitButton={<Button variant="secondary">Register</Button>}
             />
           </ModalContents>
