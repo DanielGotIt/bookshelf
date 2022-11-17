@@ -19,14 +19,21 @@ import {
   useAddToReadingListMutation,
 } from 'services/book'
 
-function TooltipButton({label, status, highlight, onClick, icon, ...rest}) {
-  const {isLoading, isError, error, reset} = status || {}
+function TooltipButton({
+  label,
+  paramsOnClick,
+  mutationHook,
+  highlight,
+  icon,
+  ...rest
+}) {
+  const [onClick, {isLoading, isError, error, reset}] = mutationHook()
 
   function handleClick() {
     if (isError) {
       reset()
     } else {
-      onClick()
+      onClick(paramsOnClick)
     }
   }
 
@@ -55,14 +62,8 @@ function TooltipButton({label, status, highlight, onClick, icon, ...rest}) {
 }
 
 function StatusButtons({book}) {
-  // const listItem = useListItem(book.id)
   const {data: listItems = []} = useGetListItemQuery()
   const listItem = listItems?.find(li => li.bookId === book.id) ?? null
-
-  const [addtoReadingList, statusAddingToList] = useAddToReadingListMutation()
-
-  const [updateListItem, statusUpdateListItem] = useUpdateListItemMutation()
-  const [removeFromList, statusRemovingFromList] = useRemoveFromListMutation()
 
   return (
     <React.Fragment>
@@ -71,18 +72,16 @@ function StatusButtons({book}) {
           <TooltipButton
             label="Mark as unread"
             highlight={colors.yellow}
-            onClick={() => updateListItem({id: listItem.id, finishDate: null})}
-            status={statusUpdateListItem}
+            mutationHook={useUpdateListItemMutation}
+            paramsOnClick={{id: listItem.id, finishDate: null}}
             icon={<FaBook />}
           />
         ) : (
           <TooltipButton
             label="Mark as read"
             highlight={colors.green}
-            onClick={() =>
-              updateListItem({id: listItem.id, finishDate: Date.now()})
-            }
-            status={statusUpdateListItem}
+            mutationHook={useUpdateListItemMutation}
+            paramsOnClick={{id: listItem.id, finishDate: Date.now()}}
             icon={<FaCheckCircle />}
           />
         )
@@ -91,16 +90,16 @@ function StatusButtons({book}) {
         <TooltipButton
           label="Remove from list"
           highlight={colors.danger}
-          onClick={() => removeFromList(listItem.id)}
-          status={statusRemovingFromList}
+          mutationHook={useRemoveFromListMutation}
+          paramsOnClick={listItem.id}
           icon={<FaMinusCircle />}
         />
       ) : (
         <TooltipButton
           label="Add to list"
           highlight={colors.indigo}
-          onClick={() => addtoReadingList({bookId: book.id})}
-          status={statusAddingToList}
+          mutationHook={useAddToReadingListMutation}
+          paramsOnClick={{bookId: book.id}}
           icon={<FaPlusCircle />}
         />
       )}
