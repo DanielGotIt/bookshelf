@@ -22,7 +22,11 @@ function BookScreen() {
   const {bookId} = useParams()
   const {data: book = {}, isFetching, isError, error} = useGetBookQuery(bookId)
 
-  const {listItem, isFetching: isListItemFetching} = useListItem(book.id)
+  const {
+    listItem,
+    isFetching: isListItemFetching,
+    isError: isGetListItemError,
+  } = useListItem(book.id)
 
   const {title, author, coverImageUrl, publisher, synopsis} = book
 
@@ -30,7 +34,7 @@ function BookScreen() {
     return <FullPageSpinner />
   }
 
-  if (isError) {
+  if (isError || isGetListItemError) {
     throw error.data
   }
 
