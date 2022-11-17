@@ -13,11 +13,11 @@ import Tooltip from '@reach/tooltip'
 import * as colors from 'styles/colors'
 import {CircleButton, Spinner} from './lib'
 import {
-  useGetListItemQuery,
   useUpdateListItemMutation,
   useRemoveFromListMutation,
   useAddToReadingListMutation,
 } from 'services/book'
+import {useListItem} from 'utils/listItemHook'
 
 function TooltipButton({
   label,
@@ -62,8 +62,7 @@ function TooltipButton({
 }
 
 function StatusButtons({book}) {
-  const {data: listItems = []} = useGetListItemQuery()
-  const listItem = listItems?.find(li => li.bookId === book.id) ?? null
+  const {listItem} = useListItem(book.id)
 
   return (
     <React.Fragment>

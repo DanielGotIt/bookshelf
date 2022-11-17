@@ -5,7 +5,6 @@ import * as React from 'react'
 import Tooltip from '@reach/tooltip'
 import {FaSearch, FaTimes} from 'react-icons/fa'
 import * as colors from 'styles/colors'
-import {useRefetchBookSearchQuery} from 'utils/books'
 import {BookRow} from 'components/book-row'
 import {BookListUL, Spinner, Input} from 'components/lib'
 import {Profiler} from 'components/profiler'
@@ -21,9 +20,8 @@ function DiscoverBooksScreen() {
     isError,
     isSuccess,
     isFetching,
+    refetch: refetchBookSearchQuery,
   } = useGetBooksQuery(query)
-
-  const refetchBookSearchQuery = useRefetchBookSearchQuery()
 
   React.useEffect(() => {
     return () => refetchBookSearchQuery()

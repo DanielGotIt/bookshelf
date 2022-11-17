@@ -15,19 +15,18 @@ import {Profiler} from 'components/profiler'
 import {StatusButtons} from 'components/status-buttons'
 import {useGetBookQuery} from 'services/book'
 import {FullPageSpinner} from 'components/lib'
-import {useGetListItemQuery, useUpdateListItemMutation} from 'services/book'
+import {useUpdateListItemMutation} from 'services/book'
+import {useListItem} from 'utils/listItemHook'
 
 function BookScreen() {
   const {bookId} = useParams()
   const {data: book = {}, isFetching, isError, error} = useGetBookQuery(bookId)
 
-  const {data: listItems = [], isFetching: listItemFetching} =
-    useGetListItemQuery()
-  const listItem = listItems?.find(li => li.bookId === book.id) ?? null
+  const {listItem, isFetching: isListItemFetching} = useListItem(book.id)
 
   const {title, author, coverImageUrl, publisher, synopsis} = book
 
-  if (isFetching || listItemFetching) {
+  if (isFetching || isListItemFetching) {
     return <FullPageSpinner />
   }
 
