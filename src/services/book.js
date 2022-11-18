@@ -96,6 +96,8 @@ export const api = createApi({
       }),
       async onQueryStarted({bookId: id, ...patch}, {dispatch, queryFulfilled}) {
         try {
+          console.log('abc')
+
           const {data} = await queryFulfilled
 
           const {listItem} = data
@@ -106,6 +108,7 @@ export const api = createApi({
           )
         } catch (e) {}
       },
+      invalidatesTags: (result, error, id) => [{type: 'ListItems', id: 'LIST'}],
     }),
     removeFromList: build.mutation({
       query: id => ({
