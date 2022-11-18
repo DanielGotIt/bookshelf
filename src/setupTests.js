@@ -6,6 +6,8 @@ import {server} from 'test/server'
 import * as usersDB from 'test/data/users'
 import * as listItemsDB from 'test/data/list-items'
 import * as booksDB from 'test/data/books'
+import {store} from 'store'
+import {api} from 'services/book'
 
 // we don't need the profiler in tests
 jest.mock('components/profiler')
@@ -29,6 +31,7 @@ afterEach(() => server.resetHandlers())
 // general cleanup
 afterEach(async () => {
   queryCache.clear()
+  store.dispatch(api.util.resetApiState())
   await Promise.all([
     auth.logout(),
     usersDB.reset(),

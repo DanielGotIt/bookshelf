@@ -10,24 +10,30 @@ import {
   FaTimesCircle,
 } from 'react-icons/fa'
 import Tooltip from '@reach/tooltip'
-import {
-  useListItem,
-  useUpdateListItem,
-  useRemoveListItem,
-  useCreateListItem,
-} from 'utils/list-items'
 import * as colors from 'styles/colors'
-import {useAsync} from 'utils/hooks'
 import {CircleButton, Spinner} from './lib'
+import {
+  useUpdateListItemMutation,
+  useRemoveFromListMutation,
+  useAddToReadingListMutation,
+} from 'services/book'
+import {useListItem} from 'utils/listItemHook'
 
-function TooltipButton({label, highlight, onClick, icon, ...rest}) {
-  const {isLoading, isError, error, run, reset} = useAsync()
+function TooltipButton({
+  label,
+  paramsOnClick,
+  mutationHook,
+  highlight,
+  icon,
+  ...rest
+}) {
+  const [onClick, {isLoading, isError, error, reset}] = mutationHook()
 
   function handleClick() {
     if (isError) {
       reset()
     } else {
-      run(onClick())
+      onClick(paramsOnClick)
     }
   }
 
@@ -56,11 +62,7 @@ function TooltipButton({label, highlight, onClick, icon, ...rest}) {
 }
 
 function StatusButtons({book}) {
-  const listItem = useListItem(book.id)
-
-  const [mutate] = useUpdateListItem({throwOnError: true})
-  const [handleRemoveClick] = useRemoveListItem({throwOnError: true})
-  const [handleAddClick] = useCreateListItem({throwOnError: true})
+  const {listItem} = useListItem(book.id)
 
   return (
     <React.Fragment>
@@ -69,14 +71,16 @@ function StatusButtons({book}) {
           <TooltipButton
             label="Mark as unread"
             highlight={colors.yellow}
-            onClick={() => mutate({id: listItem.id, finishDate: null})}
+            mutationHook={useUpdateListItemMutation}
+            paramsOnClick={{id: listItem.id, finishDate: null}}
             icon={<FaBook />}
           />
         ) : (
           <TooltipButton
             label="Mark as read"
             highlight={colors.green}
-            onClick={() => mutate({id: listItem.id, finishDate: Date.now()})}
+            mutationHook={useUpdateListItemMutation}
+            paramsOnClick={{id: listItem.id, finishDate: Date.now()}}
             icon={<FaCheckCircle />}
           />
         )
@@ -85,14 +89,16 @@ function StatusButtons({book}) {
         <TooltipButton
           label="Remove from list"
           highlight={colors.danger}
-          onClick={() => handleRemoveClick({id: listItem.id})}
+          mutationHook={useRemoveFromListMutation}
+          paramsOnClick={listItem.id}
           icon={<FaMinusCircle />}
         />
       ) : (
         <TooltipButton
           label="Add to list"
           highlight={colors.indigo}
-          onClick={() => handleAddClick({bookId: book.id})}
+          mutationHook={useAddToReadingListMutation}
+          paramsOnClick={{bookId: book.id}}
           icon={<FaPlusCircle />}
         />
       )}

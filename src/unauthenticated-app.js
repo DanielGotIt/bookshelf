@@ -5,8 +5,9 @@ import * as React from 'react'
 import {Input, Button, Spinner, FormGroup, ErrorMessage} from './components/lib'
 import {Modal, ModalContents, ModalOpenButton} from './components/modal'
 import {Logo} from './components/logo'
-import {useAuth} from './context/auth-context'
 import {useAsync} from './utils/hooks'
+import {login, register} from 'slices/authSlice'
+import {useDispatch} from 'react-redux'
 
 function LoginForm({onSubmit, submitButton}) {
   const {isLoading, isError, error, run} = useAsync()
@@ -60,7 +61,10 @@ function LoginForm({onSubmit, submitButton}) {
 }
 
 function UnauthenticatedApp() {
-  const {login, register} = useAuth()
+  const dispatch = useDispatch()
+  const onLogin = data => dispatch(login(data))
+  const onRegister = data => dispatch(register(data))
+
   return (
     <div
       css={{
@@ -87,7 +91,7 @@ function UnauthenticatedApp() {
           </ModalOpenButton>
           <ModalContents aria-label="Login form" title="Login">
             <LoginForm
-              onSubmit={login}
+              onSubmit={onLogin}
               submitButton={<Button variant="primary">Login</Button>}
             />
           </ModalContents>
@@ -98,7 +102,7 @@ function UnauthenticatedApp() {
           </ModalOpenButton>
           <ModalContents aria-label="Registration form" title="Register">
             <LoginForm
-              onSubmit={register}
+              onSubmit={onRegister}
               submitButton={<Button variant="secondary">Register</Button>}
             />
           </ModalContents>
